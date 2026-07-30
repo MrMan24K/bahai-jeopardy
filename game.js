@@ -558,6 +558,140 @@ function initGame(teamNames, difficulty) {
   showScreen('board');
 }
 
+// ── Contact (Netlify Forms) ──
+const CONTACT_EMAIL = 'kabir.alexander2010@gmail.com';
+
+function resetContactModal() {
+  $('contact-form-body').classList.remove('hidden');
+  $('contact-success').classList.remove('visible');
+  $('contact-error').classList.remove('visible');
+  $('contact-form').reset();
+  $('feedback-form').reset();
+}
+
+function showContactSuccess(message) {
+  $('contact-form-body').classList.add('hidden');
+  $('contact-error').classList.remove('visible');
+  $('contact-success-text').textContent = message;
+  $('contact-success').classList.add('visible');
+}
+
+function showContactError(message) {
+  $('contact-form-body').classList.add('hidden');
+  $('contact-success').classList.remove('visible');
+  $('contact-error-text').textContent = message;
+  $('contact-error').classList.add('visible');
+}
+
+function setContactTab(tab) {
+  const isQuestion = tab === 'question';
+  $('contact-tab-question').classList.toggle('active', isQuestion);
+  $('contact-tab-feedback').classList.toggle('active', !isQuestion);
+  $('contact-tab-question').setAttribute('aria-selected', isQuestion);
+  $('contact-tab-feedback').setAttribute('aria-selected', !isQuestion);
+  $('contact-panel-question').classList.toggle('active', isQuestion);
+  $('contact-panel-feedback').classList.toggle('active', !isQuestion);
+}
+
+function openContactModal() {
+  const modal = $('contact-modal');
+  modal.classList.add('open');
+  modal.setAttribute('aria-hidden', 'false');
+  resetContactModal();
+  setContactTab('feedback');
+}
+
+async function copyContactEmail() {
+  const btn = $('contact-email-copy');
+  try {
+    await navigator.clipboard.writeText(CONTACT_EMAIL);
+    btn.classList.add('copied');
+    btn.textContent = 'Copied!';
+    setTimeout(() => {
+      btn.classList.remove('copied');
+      btn.textContent = CONTACT_EMAIL;
+    }, 1800);
+  } catch {
+    window.prompt('Copy this email address:', CONTACT_EMAIL);
+  }
+}
+
+function closeContactModal() {
+  const modal = $('contact-modal');
+  modal.classList.remove('open');
+  modal.setAttribute('aria-hidden', 'true');
+}
+
+async function submitNetlifyForm(formName, fields) {
+  const params = new URLSearchParams({ 'form-name': formName });
+  Object.entries(fields).forEach(([key, value]) => {
+    if (value) params.append(key, value);
+  });
+
+  const response = await fetch('/', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: params.toString()
+  });
+  return response.ok;
+}
+
+function getSuggestionFields() {
+  const clue = $('contact-clue').value.trim();
+  const answer = $('contact-answer').value.trim();
+  if (!clue || !answer) {
+    alert('Please enter at least a clue and an answer for your question suggestion.');
+    return null;
+  }
+  return {
+    name: $('contact-name').value.trim(),
+    category: $('contact-category').value.trim(),
+    difficulty: $('contact-difficulty').value,
+    clue,
+    answer,
+    notes: $('contact-notes').value.trim()
+  };
+}
+
+function getFeedbackFields() {
+  const message = $('feedback-message').value.trim();
+  if (!message) {
+    alert('Please enter your feedback before sending.');
+    return null;
+  }
+  return {
+    name: $('feedback-name').value.trim(),
+    type: $('feedback-type').value,
+    message
+  };
+}
+
+async function handleContactSubmit(formName, getFields, successMessage, submitBtn) {
+  const fields = getFields();
+  if (!fields) return;
+
+  submitBtn.disabled = true;
+  const originalText = submitBtn.textContent;
+  submitBtn.textContent = 'Sending…';
+
+  try {
+    const ok = await submitNetlifyForm(formName, fields);
+    if (ok) {
+      showContactSuccess(successMessage);
+      return;
+    }
+    throw new Error('submit failed');
+  } catch {
+    const onLocalhost = ['localhost', '127.0.0.1'].includes(location.hostname);
+    showContactError(onLocalhost
+      ? 'On-site send only works on the live Netlify site — not localhost.'
+      : 'Something went wrong. Please try again in a moment.');
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.textContent = originalText;
+  }
+}
+
 // ── Event Listeners ──
 $('btn-start').addEventListener('click', () => showScreen('setup'));
 
@@ -723,7 +857,42 @@ $('btn-final-grade').addEventListener('click', () => {
 
 $('btn-play-again').addEventListener('click', () => showScreen('title'));
 
+document.querySelectorAll('.contact-open-btn').forEach(btn => {
+  btn.addEventListener('click', openContactModal);
+});
+$('contact-modal-close').addEventListener('click', closeContactModal);
+$('contact-modal-backdrop').addEventListener('click', closeContactModal);
+$('contact-tab-question').addEventListener('click', () => setContactTab('question'));
+$('contact-tab-feedback').addEventListener('click', () => setContactTab('feedback'));
+$('contact-success-close').addEventListener('click', closeContactModal);
+$('contact-error-back').addEventListener('click', resetContactModal);
+$('contact-email-copy').addEventListener('click', copyContactEmail);
+
+$('contact-form').addEventListener('submit', e => {
+  e.preventDefault();
+  handleContactSubmit(
+    'question-suggestion',
+    getSuggestionFields,
+    'Your question suggestion was sent. Thanks for helping improve the game!',
+    $('contact-submit-question')
+  );
+});
+
+$('feedback-form').addEventListener('submit', e => {
+  e.preventDefault();
+  handleContactSubmit(
+    'feedback',
+    getFeedbackFields,
+    'Your feedback was sent. Thanks for helping improve the game!',
+    $('contact-submit-feedback')
+  );
+});
+
 document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && $('contact-modal').classList.contains('open')) {
+    closeContactModal();
+    return;
+  }
   if (screens.clue.classList.contains('active')) {
     if (e.code === 'Space') { e.preventDefault(); revealAnswer(); }
     for (let i = 0; i < MAX_TEAMS; i++) {

@@ -1107,7 +1107,8 @@
         </div>
 
         <div class="contact-panel active" id="contact-panel-feedback" role="tabpanel">
-          <form class="contact-form" id="feedback-form" name="feedback">
+          <form class="contact-form" id="feedback-form" name="feedback" method="POST" data-netlify="true" netlify-honeypot="bot-field">
+            <input type="hidden" name="form-name" value="feedback">
             <p class="hp-field" aria-hidden="true">
               <label>Don’t fill this out: <input name="bot-field" tabindex="-1" autocomplete="off"></label>
             </p>
@@ -1135,7 +1136,8 @@
         </div>
 
         <div class="contact-panel" id="contact-panel-question" role="tabpanel">
-          <form class="contact-form" id="contact-form" name="question-suggestion">
+          <form class="contact-form" id="contact-form" name="question-suggestion" method="POST" data-netlify="true" netlify-honeypot="bot-field">
+            <input type="hidden" name="form-name" value="question-suggestion">
             <p class="hp-field" aria-hidden="true">
               <label>Don’t fill this out: <input name="bot-field" tabindex="-1" autocomplete="off"></label>
             </p>
@@ -1205,22 +1207,5 @@
 
   <script src="question-bank.js"></script>
   <script src="game.js"></script>
-
-  <!-- Netlify form detection (required at build time) -->
-  <form name="question-suggestion" netlify netlify-honeypot="bot-field" hidden>
-    <input type="text" name="bot-field">
-    <input type="text" name="name">
-    <input type="text" name="category">
-    <input type="text" name="difficulty">
-    <textarea name="clue"></textarea>
-    <input type="text" name="answer">
-    <textarea name="notes"></textarea>
-  </form>
-  <form name="feedback" netlify netlify-honeypot="bot-field" hidden>
-    <input type="text" name="bot-field">
-    <input type="text" name="name">
-    <input type="text" name="type">
-    <textarea name="message"></textarea>
-  </form>
 </body>
 </html>

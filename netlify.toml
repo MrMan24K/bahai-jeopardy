@@ -1,0 +1,8 @@
+# Netlify configuration for Bahá'í Jeopardy
+# Static site — publish from repository root (index.html at top level).
+# If your game lives in a subfolder (e.g. public/), change publish below.
+
+[build]
+  publish = "."
+  # No build command needed for a plain static HTML/JS/CSS site.
+  # If you add a build step later, set command here (e.g. npm run build).

@@ -1,0 +1,22 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Editor / IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Dependencies (if you add npm later)
+node_modules/
+dist/
+
+# Environment
+.env
+.env.*
+
+# Netlify local CLI folder
+.netlify/

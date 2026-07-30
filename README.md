@@ -1,38 +1,39 @@
-# bahai-jeopardy
+# Bahá'í Jeopardy!
 
-A browser-based Jeopardy-style trivia game about the Bahá'í Faith for youth or community events. Up to 4 teams, 3 difficulty levels, 430+ questions. Created by Kabir Ahmadi.
+A browser-based Jeopardy-style trivia game about the Bahá'í Faith — built for youth gatherings, study groups, and community events. No install required: open the page, name your teams, pick a difficulty, and play.
 
-## Push your local Mac files to GitHub
+## Description
 
-The cloud agent cannot read files directly from your Mac. If your game folder on your computer is not yet on GitHub, run these commands **in Terminal on your Mac** from your `bahai-jeopardy` folder:
+Bahá'í Jeopardy! is a single-page game with a classic Jeopardy board, Daily Doubles, and Final Jeopardy. It supports up to four teams and three difficulty levels (Easy, Medium, Hard), each with its own category lineup and question pool. The question bank includes 430+ clues across topics like the Central Figures, holy places, writings, history, institutions, and more.
+
+## How to play
+
+1. Open `index.html` in a browser (or visit the deployed site).
+2. Enter team names (1–4 teams).
+3. Choose **Easy**, **Medium**, or **Hard**.
+4. Click a dollar value to reveal a clue; use keyboard shortcuts to score:
+   - **Space** — reveal answer
+   - **1–4** — select team
+   - **C** / **I** — correct / incorrect
+   - **Esc** — return to board
+
+## Run locally
 
 ```bash
-cd /path/to/your/bahai-jeopardy
-
-# If this folder is not already a git repo:
-git init
-git remote add origin https://github.com/MrMan24K/bahai-jeopardy.git
-
-git add .
-git commit -m "Add Bahá'í Jeopardy game files"
-git pull origin main --rebase   # merge with README if needed
-git push -u origin main
+python3 -m http.server 8765
 ```
 
-If the folder is already linked to this repo, just `git add .`, `git commit`, and `git push`.
-
-Your site must include an `index.html` at the repository root (or update `publish` in `netlify.toml`).
+Then open [http://localhost:8765](http://localhost:8765).
 
 ## Deploy to Netlify via GitHub Actions
 
-Every push to `main` deploys to Netlify automatically once secrets are configured.
+Every push to `main` deploys to Netlify automatically once secrets are configured. This is a static site — no build step needed.
 
 ### 1. Create a Netlify site
 
 1. Sign in at [Netlify](https://app.netlify.com/).
 2. **Add new site** → **Import an existing project** → **GitHub** → select `MrMan24K/bahai-jeopardy`.
-3. Build settings: **leave build command empty** (static site). Publish directory: **`.`** (root).
-4. You can skip Netlify’s own deploy hook if you only want GitHub Actions to deploy.
+3. Build settings: **leave build command empty**. Publish directory: **`.`** (root).
 
 ### 2. Get your Netlify Personal Access Token (PAT)
 
@@ -53,14 +54,12 @@ Open this page and add two repository secrets:
 | `NETLIFY_AUTH_TOKEN` | Your Netlify personal access token |
 | `NETLIFY_SITE_ID` | Your Netlify site ID |
 
-After both secrets are saved, push to `main` (or re-run the **Deploy to Netlify** workflow under the Actions tab).
+After both secrets are saved, merge to `main` or re-run the **Deploy to Netlify** workflow under the Actions tab.
 
-## Local preview
+You can also deploy manually via [Netlify Drop](https://app.netlify.com/drop) by dragging the project folder.
 
-Open `index.html` in a browser, or use any static server:
+## Credits
 
-```bash
-python3 -m http.server 8080
-```
+**Created by Kabir Ahmadi**
 
-Then visit http://localhost:8080
+An unofficial fan project for educational and community use. Not affiliated with or endorsed by the Bahá'í International Community.

@@ -17,47 +17,6 @@ Bahá'í Jeopardy! is a single-page game with a classic Jeopardy board, Daily Do
    - **C** / **I** — correct / incorrect
    - **Esc** — return to board
 
-## Run locally
-
-```bash
-python3 -m http.server 8765
-```
-
-Then open [http://localhost:8765](http://localhost:8765).
-
-## Deploy to Netlify via GitHub Actions
-
-Every push to `main` deploys to Netlify automatically once secrets are configured. This is a static site — no build step needed.
-
-### 1. Create a Netlify site
-
-1. Sign in at [Netlify](https://app.netlify.com/).
-2. **Add new site** → **Import an existing project** → **GitHub** → select `MrMan24K/bahai-jeopardy`.
-3. Build settings: **leave build command empty**. Publish directory: **`.`** (root).
-
-### 2. Get your Netlify Personal Access Token (PAT)
-
-Create a token at: [Netlify user applications → Personal access tokens](https://app.netlify.com/user/applications#personal-access-tokens)
-
-### 3. Get your Netlify Site ID
-
-In the Netlify dashboard: open your site → **Site configuration** → **General** → **Site details** → **Site ID** (also called API ID).
-
-### 4. Add secrets in GitHub Actions
-
-Open this page and add two repository secrets:
-
-**https://github.com/MrMan24K/bahai-jeopardy/settings/secrets/actions**
-
-| Secret name | Value |
-|-------------|--------|
-| `NETLIFY_AUTH_TOKEN` | Your Netlify personal access token |
-| `NETLIFY_SITE_ID` | Your Netlify site ID |
-
-After both secrets are saved, merge to `main` or re-run the **Deploy to Netlify** workflow under the Actions tab.
-
-You can also deploy manually via [Netlify Drop](https://app.netlify.com/drop) by dragging the project folder.
-
 ## Credits
 
 **Created by Kabir Ahmadi**

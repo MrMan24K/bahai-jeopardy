@@ -8,7 +8,7 @@ Bahá'í Jeopardy! is a single-page game with a classic Jeopardy board, Daily Do
 
 ## How to play
 
-1. Open `index.html` in a browser (or visit the deployed site).
+1. Open `index.html` in a browser, or visit the deployed site at [bahaijeopardy.netlify.app](https://bahaijeopardy.netlify.app).
 2. Enter team names (1–4 teams).
 3. Choose **Easy**, **Medium**, or **Hard**.
 4. Click a dollar value to reveal a clue; use keyboard shortcuts to score:

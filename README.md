@@ -17,6 +17,12 @@ Bahá'í Jeopardy! is a single-page game with a classic Jeopardy board, Daily Do
    - **C** / **I** — correct / incorrect
    - **Esc** — return to board
 
+## Hosting
+
+Deployed on [Cloudflare Pages](https://bahaijeopardy.com) from the `main` branch. Pushes to `main` auto-deploy.
+
+Contact form submissions are handled by a Cloudflare Pages Function at `/api/contact`.
+
 ## Credits
 
 **Created by Kabir Ahmadi**

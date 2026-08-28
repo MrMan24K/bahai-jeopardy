@@ -558,7 +558,7 @@ function initGame(teamNames, difficulty) {
   showScreen('board');
 }
 
-// ── Contact (Netlify Forms) ──
+// ── Contact ──
 const CONTACT_EMAIL = 'kabir.alexander2010@gmail.com';
 
 function resetContactModal() {
@@ -622,18 +622,26 @@ function closeContactModal() {
   modal.setAttribute('aria-hidden', 'true');
 }
 
-async function submitNetlifyForm(formName, fields) {
-  const params = new URLSearchParams({ 'form-name': formName });
-  Object.entries(fields).forEach(([key, value]) => {
-    if (value) params.append(key, value);
+function getContactHoneypot(formName) {
+  const form = formName === 'feedback' ? $('feedback-form') : $('contact-form');
+  const field = form?.querySelector('input[name="bot-field"]');
+  return field?.value?.trim() || '';
+}
+
+async function submitContactForm(formName, fields) {
+  const response = await fetch('/api/contact', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      formName,
+      fields,
+      honeypot: getContactHoneypot(formName)
+    })
   });
 
-  const response = await fetch('/', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: params.toString()
-  });
-  return response.ok;
+  if (!response.ok) return false;
+  const data = await response.json().catch(() => ({}));
+  return data.ok === true;
 }
 
 function getSuggestionFields() {
@@ -675,16 +683,16 @@ async function handleContactSubmit(formName, getFields, successMessage, submitBt
   submitBtn.textContent = 'Sending…';
 
   try {
-    const ok = await submitNetlifyForm(formName, fields);
+    const ok = await submitContactForm(formName, fields);
     if (ok) {
       showContactSuccess(successMessage);
       return;
     }
     throw new Error('submit failed');
   } catch {
-    const onLocalhost = ['localhost', '127.0.0.1'].includes(location.hostname);
+    const onLocalhost = ['localhost', '127.0.0.1', ''].includes(location.hostname) || location.protocol === 'file:';
     showContactError(onLocalhost
-      ? 'On-site send only works on the live Netlify site — not localhost.'
+      ? 'On-site send only works on the live site — not when opened as a local file.'
       : 'Something went wrong. Please try again in a moment.');
   } finally {
     submitBtn.disabled = false;

@@ -560,6 +560,10 @@ function initGame(teamNames, difficulty) {
 
 // ── Contact ──
 const CONTACT_EMAIL = 'kabir.alexander2010@gmail.com';
+const CONTACT_SUBJECTS = {
+  feedback: "Bahá'í Jeopardy — Feedback",
+  'question-suggestion': "Bahá'í Jeopardy — Question Suggestion"
+};
 
 function resetContactModal() {
   $('contact-form-body').classList.remove('hidden');
@@ -629,19 +633,25 @@ function getContactHoneypot(formName) {
 }
 
 async function submitContactForm(formName, fields) {
-  const response = await fetch('/api/contact', {
+  const response = await fetch(`https://formsubmit.co/ajax/${encodeURIComponent(CONTACT_EMAIL)}`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json'
+    },
     body: JSON.stringify({
-      formName,
-      fields,
-      honeypot: getContactHoneypot(formName)
+      _subject: CONTACT_SUBJECTS[formName],
+      _template: 'table',
+      _captcha: 'false',
+      _honey: getContactHoneypot(formName),
+      form: formName,
+      ...fields
     })
   });
 
   if (!response.ok) return false;
   const data = await response.json().catch(() => ({}));
-  return data.ok === true;
+  return data.success === 'true' || data.success === true;
 }
 
 function getSuggestionFields() {

@@ -3,3 +3,9 @@
 
 [build.environment]
   NODE_VERSION = "20"
+
+[[redirects]]
+  from = "/*"
+  to = "https://bahaijeopardy.com/:splat"
+  status = 301
+  force = true

@@ -560,6 +560,10 @@ function initGame(teamNames, difficulty) {
 
 // ── Contact ──
 const CONTACT_EMAIL = 'kabir.alexander2010@gmail.com';
+const CONTACT_SUBJECTS = {
+  feedback: "Bahá'í Jeopardy — Feedback",
+  'question-suggestion': "Bahá'í Jeopardy — Question Suggestion"
+};
 
 function resetContactModal() {
   $('contact-form-body').classList.remove('hidden');
@@ -628,20 +632,63 @@ function getContactHoneypot(formName) {
   return field?.value?.trim() || '';
 }
 
-async function submitContactForm(formName, fields) {
-  const response = await fetch('/api/contact', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      formName,
-      fields,
-      honeypot: getContactHoneypot(formName)
-    })
-  });
+function submitContactForm(formName, fields) {
+  const honeypot = getContactHoneypot(formName);
+  if (honeypot) {
+    return Promise.resolve(true);
+  }
 
-  if (!response.ok) return false;
-  const data = await response.json().catch(() => ({}));
-  return data.ok === true;
+  return new Promise(resolve => {
+    const frameName = `contact-submit-${Date.now()}`;
+    const frame = document.createElement('iframe');
+    frame.name = frameName;
+    frame.style.display = 'none';
+    frame.setAttribute('aria-hidden', 'true');
+    document.body.appendChild(frame);
+
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = `https://formsubmit.co/${encodeURIComponent(CONTACT_EMAIL)}`;
+    form.target = frameName;
+    form.style.display = 'none';
+
+    const addField = (name, value) => {
+      const input = document.createElement('input');
+      input.type = 'hidden';
+      input.name = name;
+      input.value = value;
+      form.appendChild(input);
+    };
+
+    addField('_subject', CONTACT_SUBJECTS[formName]);
+    addField('_template', 'table');
+    addField('_captcha', 'false');
+    addField('_next', window.location.href.split('#')[0]);
+    addField('form', formName);
+    Object.entries(fields).forEach(([key, value]) => {
+      if (value) addField(key, value);
+    });
+
+    const cleanup = () => {
+      form.remove();
+      frame.remove();
+    };
+
+    frame.addEventListener('load', () => {
+      cleanup();
+      resolve(true);
+    });
+
+    document.body.appendChild(form);
+    form.submit();
+
+    window.setTimeout(() => {
+      if (form.isConnected) {
+        cleanup();
+        resolve(true);
+      }
+    }, 4000);
+  });
 }
 
 function getSuggestionFields() {

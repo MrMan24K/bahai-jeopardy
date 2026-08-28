@@ -1,4 +1,5 @@
 const CONTACT_EMAIL = 'kabir.alexander2010@gmail.com';
+const FROM_EMAIL = 'forms@bahaijeopardy.com';
 const ALLOWED_FORMS = new Set(['feedback', 'question-suggestion']);
 
 const SUBJECTS = {
@@ -20,6 +21,52 @@ function sanitizeFields(fields) {
     clean[key] = value.trim().slice(0, 1200);
   }
   return clean;
+}
+
+function escapeHtml(value) {
+  return String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+function formatPlainText(formName, fields) {
+  const lines = [`Form: ${formName}`, ''];
+  for (const [key, value] of Object.entries(fields)) {
+    if (value) lines.push(`${key}: ${value}`);
+  }
+  return lines.join('\n');
+}
+
+function formatHtmlTable(formName, fields) {
+  const rows = Object.entries(fields)
+    .filter(([, value]) => value)
+    .map(([key, value]) => `<tr><th align="left">${escapeHtml(key)}</th><td>${escapeHtml(value)}</td></tr>`)
+    .join('');
+
+  return `
+    <p><strong>Form:</strong> ${escapeHtml(formName)}</p>
+    <table border="1" cellpadding="8" cellspacing="0">${rows}</table>
+  `.trim();
+}
+
+async function sendEmail({ subject, text, html }) {
+  const response = await fetch('https://api.mailchannels.net/tx/v1/send', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({
+      personalizations: [{ to: [{ email: CONTACT_EMAIL }] }],
+      from: { email: FROM_EMAIL, name: "Bahá'í Jeopardy" },
+      subject,
+      content: [
+        { type: 'text/plain', value: text },
+        { type: 'text/html', value: html }
+      ]
+    })
+  });
+
+  return response.ok;
 }
 
 export async function onRequestPost({ request }) {
@@ -50,27 +97,12 @@ export async function onRequestPost({ request }) {
     return json({ ok: false, error: 'missing_clue_or_answer' }, 400);
   }
 
-  const delivery = await fetch(`https://formsubmit.co/ajax/${encodeURIComponent(CONTACT_EMAIL)}`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Accept: 'application/json'
-    },
-    body: JSON.stringify({
-      _subject: SUBJECTS[formName],
-      _template: 'table',
-      _captcha: 'false',
-      form: formName,
-      ...fields
-    })
-  });
+  const subject = SUBJECTS[formName];
+  const text = formatPlainText(formName, fields);
+  const html = formatHtmlTable(formName, fields);
+  const sent = await sendEmail({ subject, text, html });
 
-  if (!delivery.ok) {
-    return json({ ok: false, error: 'delivery_failed' }, 502);
-  }
-
-  const result = await delivery.json().catch(() => ({}));
-  if (result.success === 'false' || result.success === false) {
+  if (!sent) {
     return json({ ok: false, error: 'delivery_failed' }, 502);
   }
 

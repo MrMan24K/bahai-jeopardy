@@ -17,6 +17,3 @@ dist/
 # Environment
 .env
 .env.*
-
-# Netlify local CLI folder
-.netlify/

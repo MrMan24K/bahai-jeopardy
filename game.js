@@ -149,7 +149,7 @@ const VAGUE_ANSWERS = new Set([
   'fly', 'generation', 'body', 'knighthood', 'meditations', 'west', 'questions',
   'imprisonment', 'persecution', 'burial', 'burial rights', 'merit', 'established', 'twin pillars',
   'propagation and protection', 'teaching and protection', 'elected', 'urban development',
-  'bahai century', 'second', 'noon', 'beauty', 'islam', 'their faith', 'plan',
+  'bahai century', 'second', 'beauty', 'islam', 'their faith', 'plan',
   'meditations', 'a successor guardian', 'the appointment of a successor in his lifetime',
   'eradication of the bahai community', 'freedom of religion', 'divine guidance',
   'world commonwealth', 'political divisions', 'a bahai election', 'a spiritual assembly',
@@ -182,7 +182,7 @@ function isUnclearQuestion(question, category, level = 'easy') {
 
 function isFilteredQuestion(question, category, allowWeak = false) {
   if (!allowWeak && isWeakQuestion(question, category)) return true;
-  if (!allowWeak && isUnclearQuestion(question, category, state.difficulty)) return true;
+  if (!allowWeak && isUnclearQuestion(question, category, question.d || state.difficulty)) return true;
   return false;
 }
 
@@ -227,36 +227,47 @@ function applyTeenPreference(pool) {
   return deepPool.length ? deepPool : pool;
 }
 
-function pickQuestions(category, count, multiplier) {
+function pickQuestions(category, multiplier) {
   const slotDifficulties = getSlotDifficulties(multiplier);
+  const values = multiplier === 1
+    ? [200, 400, 600, 800, 1000]
+    : [400, 800, 1200, 1600, 2000];
 
   const picked = [];
 
-  for (const difficulty of slotDifficulties) {
+  for (let i = 0; i < slotDifficulties.length; i++) {
+    const difficulty = slotDifficulties[i];
+    const value = values[i];
+    const usedInBucket = QuestionHistory.getUsedIds(state.difficulty, category, value);
+
     let pool = getQuestionPool(category).filter(
-      q => q.d === difficulty && !picked.some(p => p.id === q.id)
+      q => q.d === difficulty &&
+        !picked.some(p => p.id === q.id) &&
+        !usedInBucket.has(q.id)
     );
 
     pool = applyTeenPreference(pool);
+
+    if (pool.length === 0) {
+      QuestionHistory.clearBucket(state.difficulty, category, value);
+      pool = getQuestionPool(category).filter(
+        q => q.d === difficulty &&
+          !picked.some(p => p.id === q.id)
+      );
+      pool = applyTeenPreference(pool);
+    }
 
     if (pool.length === 0) {
       pool = getQuestionPool(category, true).filter(
         q => q.d === difficulty && !picked.some(p => p.id === q.id)
       );
     }
-    if (pool.length === 0) {
-      pool = getQuestionPool(category, true).filter(
-        q => q.d === difficulty
-      );
-    }
-    if (pool.length === 0) {
-      pool = getQuestionPool(category, true).filter(q => !picked.some(p => p.id === q.id));
-    }
 
     const choice = shuffle(pool)[0];
     if (choice) {
       picked.push(choice);
       state.usedQuestionIds.add(choice.id);
+      QuestionHistory.markUsed(state.difficulty, category, value, choice.id);
     }
   }
 
@@ -279,7 +290,7 @@ function generateRound(roundName, multiplier, numDD) {
   const categoryNames = getCategoriesForGame();
 
   const categories = categoryNames.map(name => {
-    const questions = pickQuestions(name, 5, multiplier);
+    const questions = pickQuestions(name, multiplier);
     const clues = questions.map((q, i) => ({
       id: q.id,
       clue: q.clue,
@@ -303,6 +314,7 @@ function pickFinalJeopardy() {
   const isValidFinal = (q, allowWeak = false) =>
     tiers.includes(q.d) &&
     !state.usedQuestionIds.has(q.id) &&
+    !QuestionHistory.getUsedIds(state.difficulty, q.category, 'final').has(q.id) &&
     !isFilteredQuestion({ clue: q.clue, answer: q.answer }, q.category, allowWeak);
 
   let pool = FINAL_JEOPARDY_POOL.filter(q => isValidFinal(q));
@@ -313,12 +325,20 @@ function pickFinalJeopardy() {
     const medFinals = pool.filter(q => q.d !== 'hard');
     if (medFinals.length) pool = medFinals;
   }
-  if (pool.length === 0) pool = FINAL_JEOPARDY_POOL.filter(q => isValidFinal(q, true));
+  if (pool.length === 0) {
+    FINAL_JEOPARDY_POOL.forEach(q => {
+      QuestionHistory.clearBucket(state.difficulty, q.category, 'final');
+    });
+    pool = FINAL_JEOPARDY_POOL.filter(q => isValidFinal(q, true));
+  }
   if (pool.length === 0) pool = FINAL_JEOPARDY_POOL.filter(q => tiers.includes(q.d));
   if (pool.length === 0) pool = FINAL_JEOPARDY_POOL;
   const pick = pool[Math.floor(Math.random() * pool.length)];
   state.finalJeopardy = pick;
-  if (pick) state.usedQuestionIds.add(pick.id);
+  if (pick) {
+    state.usedQuestionIds.add(pick.id);
+    QuestionHistory.markUsed(state.difficulty, pick.category, 'final', pick.id);
+  }
 }
 
 function generateGame() {
@@ -778,7 +798,12 @@ $('btn-new-board').addEventListener('click', () => {
 });
 
 $('btn-reset-game').addEventListener('click', () => {
-  if (confirm('Reset all scores and load new questions?')) resetGame();
+  if (confirm('Reset all scores and load new questions?')) {
+    if (confirm('Also reset your personal question history for this difficulty? (You have seen some clues before.)')) {
+      QuestionHistory.resetDifficulty(state.difficulty);
+    }
+    resetGame();
+  }
 });
 
 $('btn-dd-confirm').addEventListener('click', () => {

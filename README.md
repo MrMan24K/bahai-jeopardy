@@ -76,7 +76,16 @@ python3 -m http.server 8080
 
 ## Deployment
 
-The site is hosted on **[Cloudflare Pages](https://pages.cloudflare.com)** at [bahaijeopardy.com](https://bahaijeopardy.com). Pushes to the `main` branch deploy automatically via GitHub integration.
+The site is hosted on **[Cloudflare Pages](https://pages.cloudflare.com)** at [bahaijeopardy.com](https://bahaijeopardy.com).
+
+To deploy after pushing to `main`:
+
+```bash
+npm ci
+npm run deploy
+```
+
+Requires `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` environment variables (or run `wrangler login`).
 
 To deploy your own fork:
 

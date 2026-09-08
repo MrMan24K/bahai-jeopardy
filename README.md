@@ -85,6 +85,10 @@ npm ci
 npm run deploy
 ```
 
+This regenerates `version.js` from the git revision count, then uploads to Cloudflare Pages. The welcome screen shows `Revision N · commit` so you can confirm the live build.
+
+`*.pages.dev` URLs automatically redirect to [bahaijeopardy.com](https://bahaijeopardy.com) via Pages middleware (Cloudflare does not allow fully removing the default subdomain).
+
 Requires `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` environment variables (or run `wrangler login`).
 
 To deploy your own fork:

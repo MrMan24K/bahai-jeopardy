@@ -747,6 +747,12 @@
       font-size: 0.72rem;
       color: rgba(255, 255, 255, 0.35);
     }
+    .app-version {
+      margin-top: 0.5rem;
+      font-size: 0.62rem;
+      color: rgba(255, 255, 255, 0.28);
+      letter-spacing: 0.03em;
+    }
 
     .contact-modal {
       position: fixed;
@@ -973,6 +979,7 @@
       <footer class="contact-footer">
         <button type="button" class="btn btn-contact contact-open-btn">Contact</button>
         <p class="contact-footer-hint">Suggest a question or send feedback</p>
+        <p class="app-version" id="app-version" aria-label="Site version"></p>
       </footer>
     </div>
 
@@ -1203,8 +1210,18 @@
     <div class="score-panel" id="score-3" data-team="3"><div class="score-name"></div><div class="score-amount">$0</div></div>
   </div>
 
+  <script src="version.js"></script>
   <script src="question-bank.js"></script>
   <script src="question-history.js"></script>
   <script src="game.js"></script>
+  <script>
+    (function () {
+      const el = document.getElementById('app-version');
+      if (!el || !window.APP_VERSION) return;
+      const v = window.APP_VERSION;
+      el.textContent = 'Revision ' + v.revision + ' · ' + v.commit;
+      el.title = 'Built ' + v.built;
+    })();
+  </script>
 </body>
 </html>

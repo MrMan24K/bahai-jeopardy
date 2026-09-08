@@ -4,6 +4,7 @@
     "wrangler": "^4.130.0"
   },
   "scripts": {
-    "deploy": "mkdir -p deploy && cp index.html game.js question-bank.js question-history.js deploy/ && wrangler pages deploy deploy --project-name=bahai-jeopardy --branch=main"
+    "version": "node scripts/generate-version.js",
+    "deploy": "node scripts/generate-version.js && mkdir -p deploy && cp index.html game.js question-bank.js question-history.js version.js deploy/ && cp -r functions deploy/ && wrangler pages deploy deploy --project-name=bahai-jeopardy --branch=main"
   }
 }

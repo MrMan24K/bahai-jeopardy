@@ -143,7 +143,7 @@ function isWeakQuestion(question, category) {
 
 const FIGURE_CATEGORIES = new Set(Object.keys(CATEGORY_FIGURE_ANSWERS));
 
-const ALLOWED_FIGURE_ANSWERS = /^(iran|israel|haifa|akka|tehran|paris|illinois|london|baghdad|shiraz|istanbul|chicago|wilmette|palestine|russia|turkey|africa|australia|ireland|libya|romania|hawaii|famagusta|barfurush|ishqabad|evanston|new delhi|the united states|united states|mediterranean sea|holy land|northern hemisphere|english|arabic|persian|ridvan|nawruz|the fast|the arc|guardianship|non violence|martyrdom|shiraz|1908|1920|1897|1953|1951|1957|1963|1983|1909|1912|1921|1892|1850|1844|1853|1868|1863|1891|1899|1946|1979|1849|1851|1848|1845|1992|2000|2015|36 years|four months|20 years|20|five|seven|nine|nineteen|one thousand years|noon|second|1908)/;
+const ALLOWED_FIGURE_ANSWERS = /^(iran|israel|haifa|akka|tehran|paris|illinois|london|baghdad|shiraz|istanbul|chicago|wilmette|palestine|russia|turkey|africa|australia|ireland|libya|romania|hawaii|famagusta|barfurush|ishqabad|evanston|new delhi|the united states|united states|mediterranean sea|holy land|northern hemisphere|english|arabic|persian|ridvan|nawruz|the fast|the arc|guardianship|non violence|martyrdom|shiraz|1908|1920|1897|1953|1951|1957|1963|1983|1909|1912|1921|1892|1850|1844|1853|1868|1863|1891|1899|1946|1979|1849|1851|1848|1845|1992|2000|2015|36 years|four months|20 years|20|five|seven|nine|nineteen|one thousand years|noon|second|1908|mount carmel|bahji|chihriq|edirne|civilization|civilisation|racial prejudice|hosts|the most holy)/;
 
 const VAGUE_ANSWERS = new Set([
   'fly', 'generation', 'body', 'knighthood', 'meditations', 'west', 'questions',

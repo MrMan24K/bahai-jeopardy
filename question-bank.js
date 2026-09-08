@@ -79,7 +79,7 @@ const QUESTION_BANK = {
     Q('buh-m04', 'medium', 'In 1868, Bahá\'u\'lláh and His family were banished across the Mediterranean to the prison city of this.', 'What is \'Akká?'),
     Q('buh-m05', 'medium', 'Before moving to the Mansion of Bahjí, Bahá\'u\'lláh spent about two years at a nearby country house called Mazra\'ih in this prison city.', 'What is \'Akká?'),
     Q('buh-m06', 'medium', 'Bahá\'u\'lláh\'s tablet to Napoleon III was later compiled as one of the tablets within this larger work.', 'What is the Súriy-i-Haykal?'),
-    Q('buh-m07', 'medium', 'Bahá\'u\'lláh revealed the Hidden Words in Arabic and this language.', 'What is Persian?'),
+    Q('buh-m07', 'medium', 'Many passages in the Hidden Words address the soul with the phrase "O Son of" this.', 'What is Spirit?'),
     Q('buh-m08', 'medium', 'The Seven Valleys describes the soul\'s journey using imagery from this Persian poet\'s Conference of the Birds.', 'Who is Attar?'),
     Q('buh-m09', 'medium', 'Bahá\'u\'lláh was exiled from Tehran to Baghdad in this year.', 'What is 1853?'),
     Q('buh-m10', 'medium', 'This half-brother of Bahá\'u\'lláh was appointed nominal leader by the Báb and later opposed Him.', 'Who is Mírzá Yahyá (Subh-i-Azal)?'),

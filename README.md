@@ -94,7 +94,7 @@ Requires `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` environment variable
 To deploy your own fork:
 
 1. Create a Cloudflare Pages project connected to this repository.
-2. Set **Build command** to empty and **Build output directory** to `/` (root).
+2. Set **Build command** to `node scripts/generate-version.js` and **Build output directory** to `/` (root). This keeps the welcome-screen revision and commit hash in sync with each GitHub deployment.
 3. Add your custom domain in the Pages project settings.
 
 ## Contributing
